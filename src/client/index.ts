@@ -329,8 +329,8 @@ export function apply(ctx: any): void {
     }
   }
 
-  // 设置：tidychat 命名空间，四个开关；读不到 settings 服务时全开。
-  const config = { fold: true, divider: true, navigator: true, autoLoad: true }
+  // 设置：tidychat 命名空间，四个开关 + 当前回合高亮；读不到 settings 服务时全开。
+  const config = { fold: true, divider: true, navigator: true, autoLoad: true, highlightCurrent: true }
   let settingsScope: any = null
   const settingsFace = ctx.get('webUiSettings') ?? ctx.get('settingsScope')
   if (settingsFace !== undefined && typeof settingsFace.bind === 'function') {
@@ -779,6 +779,7 @@ export function apply(ctx: any): void {
           config.divider = snap.value.divider ?? true
           config.navigator = snap.value.navigator ?? true
           config.autoLoad = snap.value.autoLoad ?? true
+          config.highlightCurrent = snap.value.highlightCurrent ?? true
         }
       } catch { /* keep defaults */ }
     }
@@ -855,7 +856,7 @@ export function apply(ctx: any): void {
   const NAV_RAIL_BAR_H = 3
   const NAV_RAIL_BAR_LEN = 14
   const NAV_RAIL_BAR_LEN_NEAR = 26
-  const NAV_RAIL_BAR_LEN_CURRENT = 22
+  const NAV_RAIL_BAR_LEN_CURRENT = 26
   const NAV_RAIL_FISH_EYE_RADIUS = 4
   const NAV_RAIL_FISH_EYE_BOOST = 0.5
   const NAV_RAIL_TURN_SPACING = 12
@@ -968,7 +969,8 @@ export function apply(ctx: any): void {
           const isCurrent = current === i
           const isHover = hover === i
           const len = isHover ? NAV_RAIL_BAR_LEN_NEAR : (isCurrent ? NAV_RAIL_BAR_LEN_CURRENT : (nearest(i) ? NAV_RAIL_BAR_LEN + 4 : NAV_RAIL_BAR_LEN))
-          const color = isCurrent || isHover ? hotColor : barColor
+          // 当前对话轮 / 悬停导航目标自动转强调色（highlightCurrent 开关控制），凸显定位条
+          const color = (isCurrent || isHover) && config.highlightCurrent ? hotColor : barColor
           ctx.fillStyle = color
           ctx.fillRect(0, y - NAV_RAIL_BAR_H / 2, len, NAV_RAIL_BAR_H)
           // 当前 turn 右侧加个小指针
@@ -1139,12 +1141,13 @@ export function apply(ctx: any): void {
       try { unsub = settingsScope.subscribe(pull) } catch { unsub = () => {} }
       return () => { try { unsub() } catch { /* ignore */ } }
     }, [])
-    const value = (snap !== null && snap !== undefined && snap.value) ? snap.value : { fold: true, divider: true, navigator: true, autoLoad: true, debug: false }
+    const value = (snap !== null && snap !== undefined && snap.value) ? snap.value : { fold: true, divider: true, navigator: true, autoLoad: true, highlightCurrent: true, debug: false }
     const writable = snap !== null && snap !== undefined ? snap.writable : false
     const fields: Array<[string, string, string]> = [
       ['fold', '自动折叠已完成轮次', '隐藏思考、工具调用与中间文字，只保留最终结论，控制条含处理时长。'],
       ['divider', '思考↔文字分隔线', '在思考行与正文文字之间插入实线，区分过程与结论。'],
       ['navigator', '左缘定位条', '聊天区左缘的细窄条状导航，悬停显示摘要、点击跳转到对应消息。'],
+      ['highlightCurrent', '当前回合高亮', '当前对话轮与悬停/导航目标回合自动转为强调色，并拉长条幅，凸显定位条、快速定位当前进度。'],
       ['autoLoad', '智能加载更早历史', '在页面空闲时逐步加载更早记录；检测到页面响应下降时自动暂停，以保持长会话流畅。需要时仍可手动继续加载。'],
     ]
     const toggle = (field: string): void => {

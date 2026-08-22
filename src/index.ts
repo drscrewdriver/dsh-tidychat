@@ -22,6 +22,8 @@ export interface Config {
   navigator?: boolean
   /** 页面空闲时逐步加载更早历史；检测到性能压力时自动暂停。 */
   autoLoad?: boolean
+  /** 当前对话轮 / 悬停导航目标自动转为强调色高亮，凸显定位条（默认开）。 */
+  highlightCurrent?: boolean
 }
 
 export const Config: z<Config> = z.object({
@@ -29,6 +31,7 @@ export const Config: z<Config> = z.object({
   divider: z.boolean().default(true),
   navigator: z.boolean().default(true),
   autoLoad: z.boolean().default(true),
+  highlightCurrent: z.boolean().default(true),
 })
 
 export const inject: string[] = []
