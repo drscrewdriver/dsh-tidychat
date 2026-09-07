@@ -6,11 +6,11 @@
  * 浏览器半通过 settingsScope 读取同一命名空间并即时生效。
  */
 
-import { installSettingsSection, settingsNamespace } from '@deepseek-ai/dsh-settings'
+import type { Context } from '@deepseek-ai/cordis'
 import z from 'schemastery'
 
-/** 设置命名空间（需在 dsh-host-apiproxy 的 WEB_SETTINGS_NAMESPACES 白名单内）。 */
-export const TIDYCHAT_SETTINGS_NAMESPACE = settingsNamespace('tidychat')
+/** 设置命名空间（v0.1.3-alpha.1 起 settings 用小写连字符字符串命名空间注册，不再经 settingsNamespace()）。 */
+export const TIDYCHAT_SETTINGS_NAMESPACE = 'tidychat' as const
 
 /** 插件配置。 */
 export interface Config {
@@ -50,8 +50,8 @@ export const NAV_STYLE_KEYS = ['bar', 'dot'] as const
 export const Config: z<Config> = z.object({
   fold: z.boolean().default(true),
   divider: z.boolean().default(true),
-  navigator: z.boolean().default(true),
-  autoLoad: z.boolean().default(true),
+  navigator: z.boolean().default(false),
+  autoLoad: z.boolean().default(false),
   navColor: z.union(NAV_HUE_KEYS).default('auto'),
   navColorLight: z.union(NAV_LIGHT_KEYS).default('l3'),
   navAccent: z.union(NAV_ACCENT_KEYS).default('auto'),
@@ -62,10 +62,21 @@ export const Config: z<Config> = z.object({
 
 export const inject: string[] = []
 
-export function apply(ctx: any, config?: Config): void {
+export function apply(ctx: Context, config?: Config): void {
   // 注册 settings 命名空间；宿主侧不消费，setSource/onChange 留空。
-  installSettingsSection(ctx, TIDYCHAT_SETTINGS_NAMESPACE, Config, config ?? {}, {
-    setSource: () => {},
-    onChange: () => {},
+  // settings API 在不同 DSH 版本不同（0.1.2+ 移除了 installSettingsSection/settingsNamespace）：
+  //   - 0.1.2-rc.1+: ctx.settings.installSection(owner, ns, schema, entry, hooks)
+  //   - 0.1.0-rc.7 / 0.1.1-rc.x: ctx.settings.register(ns, schema, { base })（register 在所有目标版本都存在）
+  // 两者都兼容：优先 installSection（保持 0.1.2 行为不变），否则回退 register。极端旧版本无 register 时静默跳过，保证插件至少能加载。
+  ctx.inject(['settings'], (settingsCtx) => {
+    const settings = (settingsCtx as any).settings
+    if (typeof settings?.installSection === 'function') {
+      settings.installSection(ctx, TIDYCHAT_SETTINGS_NAMESPACE, Config, config ?? {}, {
+        setSource: () => {},
+        onChange: () => {},
+      })
+    } else if (typeof settings?.register === 'function') {
+      settings.register(TIDYCHAT_SETTINGS_NAMESPACE, Config, { base: config ?? {} })
+    }
   })
 }

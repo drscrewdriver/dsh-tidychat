@@ -2,16 +2,22 @@
 
 > [中文](./README.md)
 
-> **▼ DSH v0.1.2-alpha.1 compatibility note**
-> - **Supported range unchanged**: the plugin targets DSH ≥ 0.1.0-rc.7 ~ 0.1.1-rc.x.
-> - **alpha.1 can't be installed directly yet**: only a source tag exists; npm is not published.
-> - **Feature overlap**: alpha.1 natively folds process content + System prompt before completed answers (on by default). This overlaps with the plugin's fold — running both double-folds.
-> - **Recommendation**: on alpha.1 pick one (native fold, or disable the plugin's fold). No change needed on 0.1.1-rc.x.
-> - **Coming**: the plugin's fold is not yet adapted to alpha.1; a version is planned after live verification.
+> **▼ DSH version compatibility**
+> | DSH version | settings registration | Fold / divider / auto-load | Left rail |
+> | --- | --- | --- | --- |
+> | 0.1.0-rc.7 / 0.1.1-rc.x | `register` | ✅ works | ⛔ paused since 0.2.6 |
+> | 0.1.2-alpha.2+ / 0.1.2-rc.1 | `installSection` | ✅ works | ⛔ paused since 0.2.6 |
+>
+> - **Settings auto-adapts**: the plugin picks the registration API per host version — `installSection` on 0.1.2+, `register` on 0.1.0-rc.7 / 0.1.1-rc.x — so the same plugin loads and registers its toggles across **DSH 0.1.0-rc.7 → 0.1.2-rc.1**.
+> - **Feature overlap**: since DSH 0.1.2 the host natively folds process content + System prompt and adds a right-edge TurnNavigator, overlapping the plugin's fold / left-edge rail.
+> - **Usage recommendation**:
+>   - **DSH 0.1.2+**: pick one with the native fold — if you use the native fold, disable the plugin's fold (avoid double-folding); if you want the plugin's fold control bar, disable the native fold.
+>   - **DSH ≤ 0.1.1-rc.x**: fold / divider / smart auto-load work normally; the left rail is likewise paused (disabled since 0.2.6).
+> - **Left rail paused**: the left-edge rail is **not shown** since 0.2.6, for two reasons: it overlaps the **right-edge TurnNavigator / native fold** that the host added in DSH 0.1.2, and its implementation depends on **`react-dom`** (not provided by the plugin or host). Whether to keep it, or rework it to work with the official navigator/fold, is **deferred to a future version** (source and historical screenshots retained).
 
 Turn long DSH conversations into a **scannable, skippable** stream of conclusions.
 
-In multi-task sessions, thoughts, tool calls, intermediate text and final summaries pile up, making it hard to find "the conclusion of that last task". dsh-tidychat automatically folds completed turns into a single conclusion line, separates thinking from prose with a divider, and provides a Codex-style navigation rail (Canvas minimap) on the left edge of the conversation — so any session, short or huge, can be browsed globally and jumped around quickly.
+In multi-task sessions, thoughts, tool calls, intermediate text and final summaries pile up, making it hard to find "the conclusion of that last task". dsh-tidychat automatically folds completed turns into a single conclusion line and separates thinking from prose with a divider; the original Codex-style navigation rail (Canvas minimap) on the left edge is **paused since 0.2.6** because it conflicts with the official new feature and has a `react-dom` dependency issue — keep/rework is left to a future version.
 
 > 🔌 Ecosystem: tagged `#dsh` · `#dsh-plugin`, contributions welcome.
 
@@ -21,11 +27,11 @@ In multi-task sessions, thoughts, tool calls, intermediate text and final summar
 | --- | --- |
 | 🗂 Auto-fold | Completed turns fold away thinking (Think), tool calls and intermediate text, keeping only the final summary; the control bar shows "N steps" and timing (duration / first token / rate) |
 | ➖ Divider | A solid line between thinking and prose — one glance separates "process" from "conclusion" |
-| 📍 Left-edge Navigation Rail (Adaptive) | Fixed-height Canvas minimap: any number of turns (tens to thousands) map to one viewport; fish-eye hover zoom, drag preview, click-to-jump to the top of the reading area; current turn highlights as you scroll; default color adapts to the background or a manual `hue × lightness` combo, accent (current/hover turn) configurable independently |
+| 📍 Left-edge Navigation Rail (Adaptive) | **Paused since 0.2.6** (conflicts with the official new feature + `react-dom` issue; keep/rework TBD). Historical capability: fixed-height Canvas minimap mapping any turn count; fish-eye hover, drag preview, click-to-jump, current-turn highlight; color auto-adapts or manual `hue × lightness`, accent independently configurable |
 | ⬆ Smart earlier-history load | Gradually loads older records while the page is idle; pauses automatically when the page's responsiveness drops, keeping long sessions smooth; manual load still available |
 | 📤 One-click issue report | Generates a diagnostic report (version / browser / performance / anomaly detection / symptom tags) and opens a pre-filled GitHub issue — title and body included, zero manual writing |
 
-All features are independent toggles in "Settings → Plugin Configuration", applied instantly; plus a one-click "Generate diagnostic report & submit" entry.
+Fold / divider / smart early-history load are independent toggles in "Settings → Plugin Configuration", applied instantly; the left-edge rail is **paused since 0.2.6** (official-feature conflict + `react-dom` issue). Also includes a one-click "Generate diagnostic report & submit" entry.
 
 ## 📸 Screenshots
 
@@ -36,7 +42,7 @@ All features are independent toggles in "Settings → Plugin Configuration", app
   <img src="./assets/fold-expanded.png" width="92%" alt="Expanded: full process restored">
 </p>
 
-**Left-edge navigation rail (Canvas minimap)**: fixed-height global mapping for any session length; hover fish-eye zoom + summary card (with date/time), drag to preview, click to jump to the top of the reading area.
+**Left-edge navigation rail (Canvas minimap)**: _paused since 0.2.6_ (official-feature conflict + `react-dom` issue; keep/rework TBD). The image below shows the historical version.
 
 <p align="center">
   <img src="./assets/navigator.png" width="92%" alt="Left-edge navigation rail and hover summary">
@@ -57,7 +63,7 @@ Prerequisite: DSH (Web) installed, `pnpm` on PATH.
 dsh plugin --profile web add @bananasoldier01/dsh-tidychat
 
 # Option 2: from GitHub (pin a tag for reproducibility)
-dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#v0.2.5
+dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#v0.2.7
 ```
 
 Restart dsh web + hard refresh (Cmd+Shift+R) after installing.
@@ -71,7 +77,7 @@ The plugin is installed as a profile dependency; updating just re-pulls that dep
 dsh plugin --profile web update @bananasoldier01/dsh-tidychat
 
 # Option B: pinned to a tag — re-add pinned to the new tag
-dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#v0.2.5
+dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#v0.2.7
 ```
 
 Restart dsh web + hard refresh after updating.
@@ -114,7 +120,7 @@ The rail upgraded from a fixed list to a **Canvas-minimap global navigator**:
 3. **Long summaries wrap**: `overflow-wrap: anywhere` keeps long code/URLs inside the card
 4. **Parser hardening**: color parsing supports `rgba` comma / space+slash syntax, `#rgb/#rgba/#rrggbb/#rrggbbaa`, `transparent`
 
-### 0.2.3 (released, current) — npm publishing (awesome-dsh-plugin recommended items)
+### 0.2.3 (released) — npm publishing (awesome-dsh-plugin recommended items)
 
 1. **peerDependencies**: `@deepseek-ai/dsh-settings` moved from `dependencies` to `peerDependencies` (host-provided runtime, no duplicate runtimes in the profile)
 2. **npm publish**: `prepublishOnly` auto-builds; `@bananasoldier01/dsh-tidychat@0.2.3` is public (prebuilt — install skips `allowBuilds`); recommended install is now `dsh plugin add @bananasoldier01/dsh-tidychat`
@@ -124,13 +130,25 @@ The rail upgraded from a fixed list to a **Canvas-minimap global navigator**:
 
 No functional changes — npm package content only: `README.en.md` bundled, `repository.url` normalized (`npm pkg fix`), bilingual README shipped. The awesome-dsh-plugin listing PR #3067 has merged (session category + screenshots).
 
-### 0.2.5 (released, current) — Hardening
+### 0.2.5 (released) — Hardening
 
 1. **Fold-state session isolation (P0)**: `foldState` now `Map<sessionId, Map<turn, boolean>>` — fixes cross-session bleed (expanding turn 5 in session A no longer leaves session B's turn 5 unexpectedly expanded)
 2. **Pointermove throttling**: high-frequency moves record the latest coordinates and process once per frame via rAF (no more React render per event); pending frames cancelled on leave/unmount
 3. **No render before measurement**: when host layout is not ready (`pos === null`), the rail no longer renders at the hardcoded 280px guess position — it appears once measurement succeeds
 4. **Snapshot/DOM turn-consistency check**: the report now compares session-snapshot turns with DOM turns and flags mismatches (loading or DOM lag)
 5. Version pins updated; package description now lists all four features
+
+### 0.2.6 (released) — Fold & divider redo; left rail paused
+
+1. **Fold redo (Codex-style)**: only folds thinking (Think) + tool calls, keeping the user message and the final formal reply; the control bar is "duration X + arrow + divider", whole bar clickable, arrow points right when folded and down when expanded; a separate divider is drawn between process and reply.
+2. **Divider redo**: the process/reply boundary now uses an inline divider (drawn via the thinking chip's `::after`, survives React re-renders) and is darkened to `rgba(96,96,96,0.85)` for better contrast.
+3. **⚠️ Left rail paused**: since DSH 0.1.2-rc.1 the host natively adds a right-edge TurnNavigator and native fold, overlapping the plugin's left rail; the rail also depends on `react-dom` (not provided by the plugin or host). So from this version the **left-edge rail is not shown**. Whether to keep it, or rework it to work with the official navigator/fold, is deferred to a future version (source and historical screenshots retained).
+4. **Fold retry notices too (issue #8)**: the host renders a retried model request as a `model-retry` row ("已重试模型请求"), which was not folded before. Since this version `model-retry` is treated as process noise and folded together with thinking/tool calls.
+
+### 0.2.7 (released, current) — Settings API backward compatibility
+
+1. **Settings registration auto-adapts**: the host chooses the right API per DSH version — `installSection` on 0.1.2+, `register` on 0.1.0-rc.7 / 0.1.1-rc.x — so the same plugin loads and registers its settings toggles across **DSH 0.1.0-rc.7 → 0.1.2-rc.1** (0.2.6 relied on the 0.1.2 `installSection`, which made old DSH report "Failed to load plugins").
+2. **Left rail**: still conflicts with the official feature and depends on `react-dom`; remains paused (this compatibility change does not restore it).
 
 ### Next (candidates)
 
