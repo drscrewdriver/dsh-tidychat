@@ -3,11 +3,14 @@
 > 🌐 [English](./README.en.md)
 
 > **▼ DSH 版本适配**
-> | DSH 版本 | settings 注册 | 折叠/分隔线/自动加载 | 消息轨（定位条） |
-> | --- | --- | --- | --- |
-> | 0.1.0-rc.7 / 0.1.1-rc.x | `register`（v0.2.7+）/ `installSettingsSection`（v0.2.5） | ✅ 折叠/分隔线/自动加载正常（v0.2.8 起回退 anchor-key；v0.2.7 不生效） | ✅ 可用（navigator 开；旧槽 + 锚点均在；旧版无官方轨，无需接管开关） |
-> | 0.1.2-alpha.2+ / 0.1.2-rc.1 | `installSection` | ✅ 正常 | ✅ 可用（未发布修复起 —— 0.2.10 及更早在 0.1.2+ 上取数路径读错快照，轨道解析出 0 轮、实际不渲染；修复后无需额外操作，「接管官方消息轨」开关单独控制是否隐藏官方轨） |
+> | 插件版本 | DSH 版本 | settings 注册 | 折叠/分隔线/自动加载 | 消息轨（定位条） |
+> | --- | --- | --- | --- | --- |
+> | **0.3.0（compat/0.1.5 线）** | **0.1.5-alpha.1+** | `installSection` | ✅ 正常（待 0.1.5 实测确认） | ✅ 可用（「接管官方消息轨」开关控制官方轨；0.1.5 TurnNavigator 硬编码于 ChatView，隐藏选择器待实测） |
+> | 0.2.10（main 线） | 0.1.0-rc.7 / 0.1.1-rc.x | `register`（v0.2.7+）/ `installSettingsSection`（v0.2.5） | ✅ 折叠/分隔线/自动加载正常（v0.2.8 起回退 anchor-key；v0.2.7 不生效） | ✅ 可用（navigator 开；旧槽 + 锚点均在；旧版无官方轨，无需接管开关） |
+> | 0.2.10（main 线） | 0.1.2-alpha.2+ / 0.1.2-rc.1 | `installSection` | ✅ 正常 | ✅ 可用（修复后无需额外操作，「接管官方消息轨」开关单独控制是否隐藏官方轨） |
 >
+> - **版本线说明**：`0.3.0` 起 inject 依赖由 `dsh-client-runtime`（0.1.2 起已移除，此前靠宿主 alias 兼容）切换为 `dsh-client-store`，**仅面向 DSH ≥ 0.1.5**；旧版本 DSH 请使用 main 线 `0.2.10`。
+
 > - **settings 自动适配**：插件按宿主 DSH 版本自动选用注册 API——0.1.2+ 用 `installSection`，0.1.0-rc.7 / 0.1.1-rc.x 用 `register`——同一份插件在 **0.1.0-rc.7 ~ 0.1.2-rc.1** 都能加载并设置开关。
 > - **消息轨（定位条）**：DSH 0.1.2 起官方原生新增右缘 TurnNavigator，与本插件定位条功能重叠。**v0.2.10 起提供「接管官方消息轨」开关**：打开即隐藏官方右缘轨，由本插件定位条接管——可贴左缘或右缘镜像，样式可选「横线 / 圆点」，另有独立的「外圈」开关。**该开关默认关闭**，不替用户改动官方行为。
 >   - ⚠️ 官方轨是**隐藏而非卸载**：宿主未提供原生开关，插件侧无法让官方组件「逻辑关闭」。开启接管后官方组件仍会挂载（DOM 保留），停掉的是绘制、布局、交互与滚动跟随。
@@ -66,7 +69,7 @@
 dsh plugin --profile web add @bananasoldier01/dsh-tidychat
 
 # 方式 2：从 GitHub 安装（推荐钉版本，可复现）
-dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#v0.2.10
+dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#compat/0.1.5
 ```
 
 安装后重启 dsh web + 硬刷新（Cmd+Shift+R）。
@@ -80,7 +83,7 @@ dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat
 dsh plugin --profile web update @bananasoldier01/dsh-tidychat
 
 # 方式 B：装的是某个 tag，改钉到新 tag 重新 add
-dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#v0.2.10
+dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#compat/0.1.5
 ```
 
 更新后同样重启 dsh web + 硬刷新。

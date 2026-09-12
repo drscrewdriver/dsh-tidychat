@@ -3,11 +3,13 @@
 > [中文](./README.md)
 
 > **▼ DSH version compatibility**
-> | DSH version | settings registration | Fold / divider / auto-load | Navigation rail |
-> | --- | --- | --- | --- |
-> | 0.1.0-rc.7 / 0.1.1-rc.x | `register` (v0.2.7+) / `installSettingsSection` (v0.2.5) | ✅ fold/divider/auto-load work (v0.2.8+ falls back to anchor-key; v0.2.7 doesn't) | ✅ available (navigator on; old slot + anchors present; no official rail to take over) |
-> | 0.1.2-alpha.2+ / 0.1.2-rc.1 | `installSection` | ✅ works | ✅ available since the unreleased fix — on v0.2.10 and earlier the rail read the wrong snapshot on 0.1.2+ and resolved 0 turns, so it never rendered; the fix needs no extra step ("Take over the official rail" only controls hiding the host rail) |
+> | Plugin version | DSH version | settings registration | Fold / divider / auto-load | Navigation rail |
+> | --- | --- | --- | --- | --- |
+> | **0.3.0 (compat/0.1.5 line)** | **0.1.5-alpha.1+** | `installSection` | ✅ works (pending 0.1.5 runtime confirmation) | ✅ available ("Take over the official rail" controls the host rail; the 0.1.5 TurnNavigator is hard-coded in ChatView — hide selector pending runtime test) |
+> | 0.2.10 (main line) | 0.1.0-rc.7 / 0.1.1-rc.x | `register` (v0.2.7+) / `installSettingsSection` (v0.2.5) | ✅ fold/divider/auto-load work (v0.2.8+ falls back to anchor-key; v0.2.7 doesn't) | ✅ available (navigator on; old slot + anchors present; no official rail to take over) |
+> | 0.2.10 (main line) | 0.1.2-alpha.2+ / 0.1.2-rc.1 | `installSection` | ✅ works | ✅ available since the unreleased fix — on v0.2.10 and earlier the rail read the wrong snapshot on 0.1.2+ and resolved 0 turns, so it never rendered; the fix needs no extra step ("Take over the official rail" only controls hiding the host rail) |
 >
+> - **Release lines**: since `0.3.0` the client inject swaps `dsh-client-runtime` (removed in 0.1.2; previously tolerated by a host alias) for `dsh-client-store`, **targeting DSH ≥ 0.1.5 only**; for older DSH use main-line `0.2.10`.
 > - **Settings auto-adapts**: the plugin picks the registration API per host version — `installSection` on 0.1.2+, `register` on 0.1.0-rc.7 / 0.1.1-rc.x — so the same plugin loads and registers its toggles across **DSH 0.1.0-rc.7 → 0.1.2-rc.1**.
 > - **Navigation rail**: since DSH 0.1.2 the host ships its own right-edge TurnNavigator, which overlaps this plugin's rail. **v0.2.10 adds a "Take over the official rail" toggle** (default **off**): turning it on hides the official right-edge rail so this plugin's rail takes over — dockable left or right (right mirrors it), with a "line / dot" display style and a separate "ring" toggle. The toggle is off by default, so nobody's official behaviour changes silently.
 >   - ⚠️ The official rail is **hidden, not unmounted**: the host exposes no native switch, so the plugin cannot make the official component "logically off". With takeover on the official component stays mounted (its DOM remains) — what stops is painting, layout, interaction and scroll-following.
@@ -66,7 +68,7 @@ Prerequisite: DSH (Web) installed, `pnpm` on PATH.
 dsh plugin --profile web add @bananasoldier01/dsh-tidychat
 
 # Option 2: from GitHub (pin a tag for reproducibility)
-dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#v0.2.10
+dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#compat/0.1.5
 ```
 
 Restart dsh web + hard refresh (Cmd+Shift+R) after installing.
@@ -80,7 +82,7 @@ The plugin is installed as a profile dependency; updating just re-pulls that dep
 dsh plugin --profile web update @bananasoldier01/dsh-tidychat
 
 # Option B: pinned to a tag — re-add pinned to the new tag
-dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#v0.2.10
+dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#compat/0.1.5
 ```
 
 Restart dsh web + hard refresh after updating.
