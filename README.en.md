@@ -2,10 +2,12 @@
 
 > [中文](./README.md)
 
+> 🧩 A web plugin for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`dsh`), listed in [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin).
+
 > **▼ DSH version compatibility**
 > | Plugin version | DSH version | settings registration | Fold / divider / auto-load | Navigation rail |
 > | --- | --- | --- | --- | --- |
-> | **0.3.0 (compat/0.1.5 line)** | **0.1.5-alpha.1+** | `installSection` | ✅ works (pending 0.1.5 runtime confirmation) | ✅ available ("Take over the official rail" controls the host rail; the 0.1.5 TurnNavigator is hard-coded in ChatView — hide selector pending runtime test) |
+> | **0.3.1 (compat/0.1.5 line)** | **0.1.5-alpha.1+** | `installSection` | ✅ works (pending 0.1.5 runtime confirmation) | ✅ available ("Take over the official rail" controls the host rail; the 0.1.5 TurnNavigator is hard-coded in ChatView — hide selector pending runtime test) |
 > | 0.2.10 (main line) | 0.1.0-rc.7 / 0.1.1-rc.x | `register` (v0.2.7+) / `installSettingsSection` (v0.2.5) | ✅ fold/divider/auto-load work (v0.2.8+ falls back to anchor-key; v0.2.7 doesn't) | ✅ available (navigator on; old slot + anchors present; no official rail to take over) |
 > | 0.2.10 (main line) | 0.1.2-alpha.2+ / 0.1.2-rc.1 | `installSection` | ✅ works | ✅ available since the unreleased fix — on v0.2.10 and earlier the rail read the wrong snapshot on 0.1.2+ and resolved 0 turns, so it never rendered; the fix needs no extra step ("Take over the official rail" only controls hiding the host rail) |
 >
@@ -23,15 +25,13 @@ Turn long DSH conversations into a **scannable, skippable** stream of conclusion
 
 In multi-task sessions, thoughts, tool calls, intermediate text and final summaries pile up, making it hard to find "the conclusion of that last task". dsh-tidychat automatically folds completed turns into a single conclusion line and separates thinking from prose with a divider; the Codex-style navigation rail (Canvas minimap) docks to either edge, and with the "Take over the official rail" toggle it replaces the host's right-edge TurnNavigator on **DSH 0.1.2+** (on older DSH there is no official rail, so it just works).
 
-> 🔌 Ecosystem: tagged `#dsh` · `#dsh-plugin`, contributions welcome.
-
 ## ✨ Features
 
 | Feature | Description |
 | --- | --- |
 | 🗂 Auto-fold | Completed turns fold away thinking (Think), tool calls and intermediate text, keeping only the final summary; the control bar shows "N steps" and timing (duration / first token / rate) |
 | ➖ Divider | A solid line between thinking and prose — one glance separates "process" from "conclusion" |
-| 📍 Navigation rail (Adaptive) | Global navigation along the chat edge, dockable **left or right** (right mirrors everything: the accent arrow points left, the hover summary opens to the left). Fixed-height Canvas minimap mapping any turn count; fish-eye hover, drag preview, click-to-jump, current-turn highlight. Two display styles: **line** / **dot**; plus a separate **ring** toggle (an accent outline around the current and hovered marks). Colour auto-adapts, or custom via a colour picker (HEX/RGB input + alpha). On **DSH 0.1.2+ you must turn on "Take over the official rail"**, otherwise it coexists with the host's right-edge rail |
+| 📍 Navigation rail (Adaptive) | Global navigation along the chat edge, dockable **left or right** (right mirrors everything: the accent arrow points left, the hover summary opens to the left). Fixed-height Canvas minimap mapping any turn count; fish-eye hover, drag preview, click-to-jump, current-turn highlight. Two display styles: **line** / **dot**; plus a separate **ring** toggle (an accent outline around the current and hovered marks). Colour auto-adapts, or custom via a colour picker (HEX/RGB input + alpha). **When earlier history is not loaded yet, an arrow appears at the rail's top — hover explains the coverage, and clicking loads earlier records.** On **DSH 0.1.2+ you must turn on "Take over the official rail"**, otherwise it coexists with the host's right-edge rail |
 | 🎛 Take over the official rail | Hides DSH 0.1.2+'s native right-edge TurnNavigator so this plugin's rail takes over. **Off by default.** Note: it hides rather than unmounts — the official component stays mounted (the host offers no native switch) |
 | ⬆ Smart earlier-history load | Gradually loads older records while the page is idle; pauses automatically when the page's responsiveness drops, keeping long sessions smooth; manual load still available |
 | 📤 One-click issue report | Generates a diagnostic report (version / browser / performance / anomaly detection / symptom tags) and opens a pre-filled GitHub issue — title and body included, zero manual writing |
@@ -47,10 +47,17 @@ Fold / divider / smart early-history load / take-over-the-official-rail are inde
   <img src="./assets/fold-expanded.png" width="92%" alt="Expanded: full process restored">
 </p>
 
-**Navigation rail (Canvas minimap)**: dockable left or right, style line / dot, ring independently toggleable. The image below was taken on old DSH without the official right-edge TurnNavigator (since v0.2.10 the same works on DSH 0.1.2+ once "Take over the official rail" is on).
+**Navigation rail (Canvas minimap)**: dockable left or right, style line / dot, ring independently toggleable. Hovering shows that turn's summary; clicking jumps to it. The image below was taken on old DSH without the official right-edge TurnNavigator (since v0.2.10 the same works on DSH 0.1.2+ once "Take over the official rail" is on).
 
 <p align="center">
-  <img src="./assets/navigator.png" width="92%" alt="Navigation rail and hover summary">
+  <img src="./assets/navigator.png" width="92%" alt="Rail (left + line) with hover summary">
+  <img src="./assets/navigator-right-dot-ring.png" width="92%" alt="Rail (right + dot + hover ring), summary card opens to the left">
+</p>
+
+**When earlier history is not loaded** (turns above are not mounted yet — common right after opening a long session): an arrow and a dashed line appear at the top of the rail; hovering explains the current coverage and **clicking loads earlier records**.
+
+<p align="center">
+  <img src="./assets/navigator-cap.png" width="58%" alt="Not-yet-loaded history hint with one-click load">
 </p>
 
 **Settings panel**: four independent toggles (including "Take over the official rail") + rail position/style/ring + symptom tags + one-click "Generate diagnostic report & submit", applied instantly.
