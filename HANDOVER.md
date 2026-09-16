@@ -1,19 +1,19 @@
 # dsh-tidychat 交接文档（HANDOVER）
 
-> 面向：接续开发的新会话 / 新协作者。内容基于 **v0.2.10（feat/rail-mirror-and-dots）** 快照。仓库根目录：`/Users/wuke/工作文件/DeepSeek_Harness/dsh-tidychat`（本机 link 模式开发）。
+> 面向：接续开发的新会话 / 新协作者。内容基于 **v0.3.1（main）** 快照。仓库根目录：`/Users/wuke/工作文件/DeepSeek_Harness/dsh-tidychat`（本机 link 模式开发）。
 
 ---
 
 ## 0. 一句话背景
 
-`dsh-tidychat` 是一个 **DSH（DeepSeek Harness）Web 插件**：把长会话整理成「可扫读、可跳转」的结论流——四个独立开关：自动折叠已完成轮次、思考↔正文分隔线、消息轨（Canvas minimap 全局导航）、智能加载更早历史；消息轨另有「显示位置（左/右）」「显示样式（横线/圆点）」「外圈（关/开）」三项，以及「接管官方消息轨」开关；外加「生成诊断报告并提交 GitHub issue」一键入口。**注意：消息轨在 DSH 0.1.0-rc.7 ~ 0.1.2-rc.1 全区间可用** —— 旧版无官方右缘 TurnNavigator，直接用；**DSH 0.1.2+ 需打开「接管官方消息轨」开关**隐藏官方轨后继任（默认关）。
+`dsh-tidychat` 是一个 **DSH（DeepSeek Harness）Web 插件**：把长会话整理成「可扫读、可跳转」的结论流——四个独立开关：自动折叠已完成轮次、思考↔正文分隔线、消息轨（Canvas minimap 全局导航）、智能加载更早历史；消息轨另有「显示位置（左/右）」「显示样式（横线/圆点）」「外圈（关/开）」三项，以及「接管官方消息轨」开关；外加「生成诊断报告并提交 GitHub issue」一键入口。**注意：消息轨在 DSH 0.1.0-rc.7 ~ 0.1.2-rc.1 全区间可用** —— 旧版无官方右缘 TurnNavigator，直接用；**DSH 0.1.2+ 需打开「接管官方消息轨」开关**隐藏官方轨后继任（默认关）。另有**首次引导**：检测到「插件轨 + 官方轨并存」时弹一次向导（左缘 = 插件 / 右缘 = 官方），可一键二选一（含解除接管）；`navGuideSeen` 记录是否已看过，设置卡片内有「重新显示首次引导」。
 
 - 仓库：https://github.com/BananaSoldier01/dsh-tidychat（owner：BananaSoldier01）
 - fork：https://github.com/drscrewdriver/dsh-tidychat（origin；upstream = 上面的原仓库）
-- npm：`@bananasoldier01/dsh-tidychat`（public，最新 **0.2.9**；0.2.10 尚未发布）
+- npm：`@bananasoldier01/dsh-tidychat`（public，最新 **0.3.1**）
 - 插件索引：**awesome-dsh-plugin 已收录**（PR #3067 合并，session 分类 + 截图），即 dsh-market 源
-- 当前版本线：v0.2.0 → v0.2.10（0.2.0 导航条大版本；0.2.1 配色；0.2.2 提示卡可读性；0.2.3 配色/publish 准备；0.2.4 npm 元数据；0.2.5 Hardening；0.2.6 折叠/分隔线重做；0.2.7 settings API 向后兼容；0.2.8 旧版 DSH 折叠回退；0.2.9 调色盘配色；**0.2.10 接管官方消息轨 + 外圈 + 「竖条」误标修正**）
-- 分支：`feat/rail-mirror-and-dots`（= `upstream/main` v0.2.9 + 镜像/圆点 feature + v0.2.10 改动）；`shadow/main` = 纯净 `upstream/main`，备用主线，见 §4.6
+- 当前版本线：v0.2.0 → v0.3.0（0.2.0 导航条大版本；0.2.1 配色；0.2.2 提示卡可读性；0.2.3 配色/publish 准备；0.2.4 npm 元数据；0.2.5 Hardening；0.2.6 折叠/分隔线重做；0.2.7 settings API 向后兼容；0.2.8 旧版 DSH 折叠回退；0.2.9 调色盘配色；**0.3.0 接管官方消息轨 + 外圈 + 0.1.2+ 取数路径修复 + 首次引导 + 设置项重排 + 跳转滚动缓动；0.3.1 「更早历史未加载」提示带 + 一键加载、点击标记落点错位修复**）
+- 分支：PR #10（`feat/rail-mirror-and-dots`）**已并入 main**（merge commit `34bc43c`，0.3.0 发布）；后续维护者改动在其之上（首次引导 / 设置项重排 / 滚动缓动）。`shadow/main` 备用主线已无必要
 
 ---
 
@@ -28,19 +28,20 @@ dsh-tidychat/
 ├── lib/                      # 构建产物（git 跟踪！link 模式实际被服务的就是它）
 │   ├── index.js              # host 半产物（~2.2 kB）
 │   └── client.js             # 浏览器半产物（~72 kB）
-├── assets/                   # 效果图：fold-collapsed/expanded.png、navigator.png、settings.png
+├── assets/                   # 效果图：fold-collapsed/expanded.png、navigator.png（3372×1612）、settings.png（1112×2002，整卡拼接）
 ├── docs/                     # PR 兼容性分析（顶部含 2026-09-11 订正说明）
 ├── screenshots.json          # awesome-dsh-plugin 新约定：本仓库声明截图（相对路径数组）
 ├── scripts/whitelist-patch.sh # DSH ≤ rc.6 的 settings 白名单补丁（幂等）
 ├── .github/ISSUE_TEMPLATE/   # bug_report.yml / feature_request.yml
 ├── cordis.patch.yml          # dsh.bundle 的 patch 声明
-├── package.json              # 0.2.10；dsh.bundle 清单；peerDependencies（dsh-settings/react）
+├── package.json              # 0.3.1；dsh.bundle 清单；peerDependencies（dsh-settings/react）
 │                             # dependencies 仅 schemastery；files 白名单；prepublishOnly=pnpm build
 │                             # ⚠️ 元数据冻结：除 version / description 外不得改动
 ├── tsdown.config.ts          # 构建配置；用 createRequire 读 package.json 版本 → __PLUGIN_VERSION__
 ├── tsconfig.json
-├── README.md                 # 中文默认（npm/GitHub 首页展示）
-├── README.en.md              # 英文全量版；两文件顶部互链
+├── README.md                 # 中文默认（npm/GitHub 首页展示）—— 只放当前能力与用法（~142 行）
+├── README.en.md              # 英文全量版；两文件顶部互链，小节结构逐行对齐
+├── CHANGELOG.md              # 逐版本变更（0.1.1 → 0.3.1）；README 的路线图历史已迁到此处
 ├── HANDOVER.md               # 本文件
 └── LICENSE (MIT)
 ```
@@ -55,9 +56,12 @@ dsh-tidychat/
 
 - `settings.plugin.item`：**keyed 槽**（rc.7 起由 list 改为 keyed），注册必须 `key: 'tidychat'`（同命名空间），旧 `id` 写法会报 "Failed to load plugins"
 - `conversation.session.header.utilities`：子槽列表，导航条组件注册 `id: 'tidychat-nav'`（order 100）。**已核实 0.1.2-rc.1 仍存在且被渲染**（契约 `dsh-client-ui-conversation/lib/types/client/contract/slots.d.ts`，实现 `lib/client.js` 的 `renderSlot("conversation.session.header.utilities", {})`）
+- `shell.overlay`：**list 槽 / scope root** 的框架级浮层（默认点击穿透；占位者需自行 `pointer-events: auto`，否则会挡住应用）。首次引导组件注册 `id: 'tidychat-guide'`（契约见 `dsh-client-ui-layout`）
 - DOM 锚点：`data-chat-anchor-key`、`data-chat-flow-kind`（user / think / context …）、`data-variant="think"`、`[data-conversation-scroll]`、`[data-composer-card]`
 - `conversationContextKey` = `${kind.length}:${kind}${id}`
 - API：`settingsScope.bind({ namespace: 'tidychat' })`、`ctx.sessions.binding(sid)`、`installSettingsSection(ctx, ns, schema, entry, hooks)`
+- 消息轨取数：`binding.eventSource.getSnapshot().entries`（会话**事件窗** `SessionEventSource`）。**不要用 `session.getSnapshot()` 取消息节点** —— 0.1.2+ 它只返回控制字段（queue/running/hasMore/openState…），没有 `nodes`，按旧假设取数会解析出 0 轮、组件直接 `return null`（零 DOM、无报错）
+- 配置字段（host schema）：`fold` / `divider` / `navigator` / `hideOfficialNav` / `autoLoad` / `navColor`+`navColorCustom`+`navColorLight` / `navAccent`+`navAccentCustom`+`navAccentLight` / `navSide` / `navStyle` / `navRing` / `navGuideSeen`
 - 语义色 token：`--dsw-alias-label-primary/secondary/tertiary/caption`、`--dsw-alias-bg-layer-3`、`--dsw-alias-state-business-primary`、`--dsw-alias-border-l2`
 
 ### 2.1 官方 TurnNavigator 契约（v0.2.10 新增，接管开关用）
@@ -121,11 +125,13 @@ html[data-tidychat-hide-official-nav] nav[class*="_frame"]:has([style*="--turn-n
    - 历史教训（勿重蹈）：0.2.2 前期把半透明白当浅底 → 官方深色「暗底暗字」；后来加 alpha 合成 → 深蓝主题仍误判。最终方案 = 纯 token 跟随 + 不透明时才兜底。
 2. **默认行为不得回归**：用户实测过「官方深/浅、玻璃皮肤、异常 token 皮肤」的明暗正确性，任何改动别破坏「跟随正文颜色」的直觉（`label-primary`/`label-secondary`）。
 3. **工程收口优先于加功能**（GPT 评审结论，用户已采纳方向）：0.2.5 已做 foldState 隔离、rAF 节流、测量前不渲染、快照/DOM 一致性诊断；**纯函数抽取 + 单测 + CI 明确推迟到 0.3.0 前置**（理由：函数都在 `apply()` 闭包内、依赖活的 `config`，抽取需参数化；绝不能边移动边改逻辑——对比度/alpha 阈值是最容易出回归的领域）。
-4. **版本节奏**：小修小补 0.2.x，新功能线 0.3.0（Contextual Follow-up，尚未开始）；README 路线图每个版本更新（章节 + 上一版标「已发布」+ 钉版示例 `#vX.Y.Z`），双语同步。
+4. **版本节奏**：小修小补 0.2.x，新功能线 0.3.0（Contextual Follow-up，尚未开始）；**逐版本变更写进 `CHANGELOG.md`**（最新在前，含日期），README 只留「当前能力 + 用法 + 路线图候选三条」，钉版示例 `#vX.Y.Z` 随版本更新，双语同步。发布时同时更新 GitHub About（描述 + homepage=npm 页）与截图。
 5. **社区约定**：截图声明在**本仓库** `screenshots.json`（相对路径数组）；给 awesome-dsh-plugin 提 PR 时 fork main 必须与上游同步、README 由 `scripts/generate-readme.mjs` 生成（不手编）。
 6. **文案必须与绘制代码对齐（0.2.10 教训）**：显示样式选项曾长期写作「竖条」，而绘制是 `fillRect(x, y, width, height)` 且宽（14–26px）远大于高（3px）——**一直是横线**，仓库里从未有过竖线绘制元件。这个错误标签传播进了文档，甚至误导过一次方案设计（差点新增一个与之同形的「横线」档）。**改绘制参数时同步改所有提及该样式的文案，反之亦然**；`grep 竖条 src/` 应保持零命中。
 7. **文档结论要能被 `git grep` 复核（0.2.10 教训）**：「定位条依赖 react-dom」写进了 README/HANDOVER 却没复核 —— 实际上 `git grep react-dom` 在源码零命中，构建产物唯一的 `require()` 实参是 `react`，该说法源自 0.2.6 之前就已删除的一套临时 DOM 实现。写「依赖 X」之前先 grep；发现不成立要主动订正。
 8. **接管官方轨只能隐藏，不能卸载（0.2.10 结论）**：见 §2.1 语义边界。**禁止**改用 JS 删节点。
+9. **「已加载窗口」是定位条的事实边界（0.3.1 结论）**：DSH 只挂载已加载窗口（长会话新开时可能只有 2 个用户行，甚至 0 个 —— 消息窗口落在某个回合内部）。因此①轨道按轮数自适应高度时会出现 48px 短桩，②`turns.length === 0` 时不能直接 `return null`（否则连「还有更早历史」的提示都没有）。现在的做法：顶部提示带 + 点击加载，且没有更早历史时不显示。
+10. **命中测试不得依赖 hover 自身（0.3.1 教训）**：鱼眼布局 `layoutPositions(n, hover, H)` 的入参就是 hover，用「上一次 hover」算出的坐标做 y 最近邻会自反馈 —— 悬停后标记重排 → 同一 y 解析出别轮 → **提示与落点不一致**（实测 ±2 轮）。凡「绘制 / 命中 / 落点」共用同一坐标系的场景，命中一律取与状态无关的固定点解（见 `indexAt`）。新增任何随 hover 变化的布局参数时，必须重跑 `hitTest*` 口径的验证。
 
 ### 4.6 影子 main（`shadow/main`）
 
@@ -186,15 +192,28 @@ pnpm install && pnpm run build   # 产出 lib/
 - **样式组合矩阵**：`横线/圆点` × `左缘/右缘` × `外圈 关/开` = 8 组逐项目检（绘制、悬停摘要、点击跳转、右缘摘要卡不溢出）
 - **性能三态观测**：A 官方轨正常+插件关 / B 官方轨隐藏+插件开 / C 官方轨隐藏+插件关，比较 `document.getElementsByTagName('*').length` 与内存；**先测再决定是否优化**
 
+### 6.1 README 截图重拍（kimi-webbridge，2026-09-16 实践有效）
+
+headless 客户端打不开正在运行的会话，**改用 kimi-webbridge 驱动用户真实浏览器**（复用其 GUI cookie，无需 `dsh web` 打印的一次性 token——launch token 只在进程内存里，磁盘上取不到）。脚本在 `/Users/wuke/工作文件/DeepSeek_Harness/.shot/`（`wb.py` 发命令、`card2shot.py`+`stitch.py` 拼设置卡、`hover.js`/`expandTurn.js` 造状态）。
+
+- 设置弹窗靠 **pointerdown** 打开：合成 `click` 无效，必须依次派发 `pointerdown/mousedown/pointerup/mouseup/click`（完整序列见 `opensettings.py`）
+- `tidychat-card` 展开后高约 1000px > 弹窗可视区，元素级截图会切掉卡片顶部：改为「对齐 → 视口截图 → 按几何用 PIL 纵向拼接」（两段即可覆盖）
+- 悬停摘要、展开折叠：合成 `PointerEvent('pointermove')` / `.click()` 即可触发（React 根监听）
+- **取景前先点几次「加载更早」**：DSH 只挂载已加载窗口，用户 `autoLoad:false` 时新开一个长会话只挂几轮 → 定位条按 `max(48, 12px×轮数)` 退化成 48px 短桩（不是 bug，是「DOM 即事实源」的直接后果）；加载到 ~50 轮才是满高 564px
+- 只做只读操作（滚动 / 悬停 / 展开 / 开设置页），**不要点引导按钮**（会写 `navGuideSeen`）
+- **变体图**（右缘 + 圆点 + 外圈）：必须临时改设置 → 拍完立刻改回，并逐字段核对 `~/.dsh/settings.yaml` 已还原（0.3.1 拍图时改的是 `navSide`/`navStyle`/`navRing` 三项，其余字段未动）
+- `settings.png` 用 `card2shot.py`（对齐 → 视口截图 ×2 → `stitch.py` 纵向拼接）；提示带细节图用 `crop_cap.py` 从整屏图裁 `x∈[250,700] y∈[132,330]`
+- 收尾 `close_session` 关掉桥接标签组
+
 ---
 
-## 7. 待办 / 路线图（截至 v0.2.10）
+## 7. 待办 / 路线图（截至 v0.3.1）
 
-- **0.3.0 Contextual Follow-up**（用户已选中，未开工）：选中 Assistant 最终正文 → 浮出「添加到对话」→ Composer 上方引用卡片 → 发送时携带引用。V1 严格限定：只支持 Assistant 最终正文；内部抽象 `SelectionReference`（sessionId / anchorKey / selectedText / sourceType）
+- **Contextual Follow-up**（用户已选中，未开工；原计划挂在 0.3.0，0.3.0 已被「消息轨恢复 + 接管/样式/引导」占用）：选中 Assistant 最终正文 → 浮出「添加到对话」→ Composer 上方引用卡片 → 发送时携带引用。V1 严格限定：只支持 Assistant 最终正文；内部抽象 `SelectionReference`（sessionId / anchorKey / selectedText / sourceType）
 - **0.3.0 前置**：纯函数抽取（parseRgba/contrastRatio/layoutPositions/indexFromY/cleanTiming 等）+ vitest 单测 + GitHub Actions（install/typecheck/test/build）
 - **TurnSnapshot → Incremental Turn Index**：推迟，等真实 500+/1000+ 轮数据（README 路线图已注明）
 - **issue #2**：运行中回合的已完成步骤折叠（需求强度待验证）
-- **向上游提 issue（0.2.10 建议）**：① 为原生 TurnNavigator 提供开关或槽位覆盖，让插件能真正「逻辑关闭」而非仅隐藏；② 把 rail items 从「全会话大纲」改为「仅已加载窗口 + 懒加载」，削减超长会话的标记数
+- **向上游提 issue（0.2.10 建议）**：① 为原生 TurnNavigator 提供开关或槽位覆盖，让插件能真正「逻辑关闭」而非仅隐藏；② 把 rail items 从「全会话大纲」改为「仅已加载窗口 + 懒加载」，削减超长会话的标记数（0.3.1 已把「仅已加载窗口」这件事显式告知用户并给了一键加载，但尚未向上游提 issue）
 - 大方向判断（GPT 评审共识）：**别再堆「会话管理小功能」**（搜索/Bookmark/Token 统计等），主线是 **Long Conversation UX**：少看无关过程 → 快速定位历史 → 针对具体内容继续交流
 
 ---
@@ -205,3 +224,5 @@ pnpm install && pnpm run build   # 产出 lib/
 - PR：#5（drscrewdriver 配色）已合并；#3 早期合并；awesome-dsh-plugin #3067 已合并
 - 贡献者：drscrewdriver（PR #5、issue #4/#6/#7）；维护者 = BananaSoldier01
 - 投稿 fork：`/Users/wuke/工作文件/DeepSeek_Harness/awesome-dsh-plugin`（已合并；将来再投稿先 `git fetch upstream && git rebase upstream/main`）
+- **awesome 条目更新（2026-09-16）**：PR **#5218** 更新简介（原文只写「左缘定位条」，0.3.0/0.3.1 后已不准确）。流程 = 只改 `data/plugins/BananaSoldier01__dsh-tidychat.yml` → `node scripts/generate-readme.mjs`（README 需一并提交且 `--check` 要过）→ 推 fork 分支 → `gh pr create`；整份改动只有 +4/−4。
+- ⚠️ **截图约定已变更**：截图声明放**本仓库**的 `screenshots.json`（相对路径数组，≤8 张），由上游 `probe-screenshots.mjs` 抓取；上游 `data/screenshots.json` 是**遗留文件**，本仓库一旦声明了自己的截图，上游那份会被 `prune-legacy-screenshots.mjs` 删除——**不要去改上游那个文件**（0.3.1 时改过一次，已回退）。

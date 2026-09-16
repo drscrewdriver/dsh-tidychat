@@ -5,7 +5,20 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [SemVer](https://semver.org/lang/zh-CN/)。
 
 > **版本线说明（本仓库 = fork）**：本仓库是上游 [BananaSoldier01/dsh-tidychat](https://github.com/BananaSoldier01/dsh-tidychat) 的 fork，维护一条 **DSH 0.1.5 优先线**（分支 `compat/0.1.5`，面向 **DSH ≥ 0.1.5**）；上游 `main` 面向旧版宿主（0.1.0-rc.7 ~ 0.1.2-rc.1）。
-> 两条线共用 `0.3.0` 之前的版本历史（下表逐条同源）；`0.3.0` 起版本号相同但**内容各自演进**，因此每个版本条目下都注明「在本仓库 0.1.5 线上是否实际生效」。
+> 两条线共用 `0.3.0` 之前的版本历史（下表逐条同源）；`0.3.0` 起版本号相同但**内容各自演进**。本仓库 `0.1.5` 线**已完整并入上游 `main`**（`git merge upstream/main`，合并后上游 `main` 是本线的祖先），故每个版本条目下标注「在本仓库 0.1.5 线上是否实际生效」。
+
+## [Unreleased] — 本仓库 0.1.5 线
+
+**并入上游 `main`（合并提交）**
+
+- 本仓库 `0.1.5` 线此前只移植了上游 `main` 的**修复类**提交（`04f8ff9` 落点修复、`16dd14a` 截图、README 三条），**体验类**提交 `457998b`（首次引导 / 设置项重排 / 跳转滚动缓动）一直缺席——本线因此出现「版本号 0.3.1 却不带 0.3.0 引导」的错位。
+- 现以 `git merge upstream/main` 把上游 `main` **整体并入**本线，`upstream/main` 成为本线的祖先，此后不再有「上游有、本线没有」的条目。0.1.5 独有适配（`dsh-client-store` inject、peer `^0.1.5-rc.2`、`engines.dsh >= 0.1.5-alpha.1`）保持不变。
+- **合并冲突的裁决**：`src/client/index.ts` 因双侧都实现了「提示带 + 落点修复」而重复声明了 `inCap` / `markY` / `indexAt`，取本线那一份（带上游的 `smoothScrollTo` 滚动缓动）；`package.json` 取本线的 `description` / `inject` / `peerDependencies` / `files`（含 `README.md`）；`README.md` / `README.en.md` 以上游新结构为底、把本线的「版本线」与 0.1.5 兼容行并入兼容性表；`CHANGELOG.md` 取上游版本并保留本线的 0.1.5 专属条目；重新拍摄的 `assets/*.png` 取上游版本（对应新的提示带 UI）。
+
+**新增门禁（此前该仓库没有 test / lint）**
+
+- `pnpm test`：7 条发布契约断言（`tests/contract.spec.mjs`，`node:test`，跑在 `lib/**` 上）。重点是**合并无损守卫**——上游 `main` 与本线各自的功能标记（`navGuideSeen` / `shell.overlay` / `prefers-reduced-motion` vs `data-tidychat-hide-official-nav` / `--turn-natural-position`）必须同时存在于产物里，任何一侧被合并丢了都会红。另有：命名空间、README 表格里的 schema 默认值逐项、产物零 `dsh-client-runtime`、外部依赖白名单、版本号确实由构建注入。反证已做：往 `lib/client.js` 塞回 `@deepseek-ai/dsh-client-runtime` → 用例 3 失败（6 passed / 1 failed），还原后 7/7。
+- `pnpm run lint`：`eslint` flat config（`eslint.config.mjs`，`@eslint/js` + `typescript-eslint`）。首次开启时清掉了 4 处真实死代码（`NAV_HUE_OPTIONS` / `NAV_LIGHT_OPTIONS` 两个从未被引用的配色常量，`hasTextInStep` 这个从未被调用的函数，`hasAnswerOutsideThink` 的未用形参）。
 
 ## [0.3.1] — 2026-09-16
 
@@ -18,7 +31,7 @@
 
 ## [0.3.0] — 2026-09-16
 
-消息轨恢复渲染 + 接管 / 样式 / （上游另有）首次引导。
+消息轨在 DSH 0.1.2+ 恢复渲染 + 接管 / 样式 / 首次引导。
 
 > 本版合并了原计划作为 `0.2.10` 发布的内容（PR #10）、取数路径修复，以及维护者追加的首次引导等改动。`0.2.10` 从未发布到 npm，其内容随本版一起发布。
 
@@ -43,8 +56,8 @@
 10. **设置项重排与改名**：「显示位置 / 显示样式 / 外圈」移到「定位条」开关正下方；标签「左缘定位条」→「**定位条**」（配置键仍是 `navigator`，不动已发布的键名）。
 11. **跳转滚动缓动**：原生 `behavior:'smooth'` → 自绘 rAF 动画（距离自适应 260–700ms + easeInOutCubic，可被滚轮/触摸/按键打断，尊重 `prefers-reduced-motion`）。
 
-> ⚠️ **本仓库 0.1.5 线未携带上面第 9–11 项**（上游 `457998b` 亦未同步）：首次引导、设置项重排与滚动缓动属于**上游 `main` 线的体验增强**，不在本 fork `0.1.5` 线的移植范围内，属已知缺口（本文件记「未生效」而非「已发布」）。
 > 第 1–8 项在本仓库 `0.1.5` 线上**均已生效**——PR #10 的镜像 / 圆点 / 外圈 / 接管官方轨与取数路径修复，在本 fork 线上早于本版就已存在（分支内 `ab1cf5e`、`263e363`、`f2ac9de`、`462b2d2`、`ddd4168`）。
+> 第 9–11 项（首次引导 / 设置项重排 / 滚动缓动）原为上游 `457998b` 独有，本仓库 `0.1.5` 线**现已随上游 `main` 一并并入并生效**。
 
 **本仓库 0.1.5 线专属（`1c182b7`，同版本号）**
 
