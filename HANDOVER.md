@@ -10,9 +10,9 @@
 
 - 仓库：https://github.com/BananaSoldier01/dsh-tidychat（owner：BananaSoldier01）
 - fork：https://github.com/drscrewdriver/dsh-tidychat（origin；upstream = 上面的原仓库）
-- npm：`@bananasoldier01/dsh-tidychat`（public，最新 **0.3.2**；`0.3.0`/`0.3.1` 为旧宿主维护线终版，`0.3.2` 起为 DSH 0.1.7 线，dist-tag `dsh-0.1.7`）
+- npm：`@drscrewdriver/dsh-tidychat`（public，最新 **0.3.3**，dist-tag `dsh-0.1.7`；`0.3.2` 基于过旧基线、缺 0.2.10~0.3.1 功能，勿用）。上游 `@bananasoldier01/dsh-tidychat` 停在 0.3.1（旧宿主维护线）；0.1.7 迁移已提 PR BananaSoldier01/dsh-tidychat#15
 - 插件索引：**awesome-dsh-plugin 已收录**（PR #3067 合并，session 分类 + 截图），即 dsh-market 源
-- 当前版本线：v0.2.0 → v0.3.0（0.2.0 导航条大版本；0.2.1 配色；0.2.2 提示卡可读性；0.2.3 配色/publish 准备；0.2.4 npm 元数据；0.2.5 Hardening；0.2.6 折叠/分隔线重做；0.2.7 settings API 向后兼容；0.2.8 旧版 DSH 折叠回退；0.2.9 调色盘配色；**0.3.0 接管官方消息轨 + 外圈 + 0.1.2+ 取数路径修复 + 首次引导 + 设置项重排 + 跳转滚动缓动；0.3.1 「更早历史未加载」提示带 + 一键加载、点击标记落点错位修复；0.3.2 DSH 0.1.7 声明式设置迁移（volatile 自动成表 + configForms 缝 + 设置卡迁 settings.plugins.tab）**）
+- 当前版本线：v0.2.0 → v0.3.0（0.2.0 导航条大版本；0.2.1 配色；0.2.2 提示卡可读性；0.2.3 配色/publish 准备；0.2.4 npm 元数据；0.2.5 Hardening；0.2.6 折叠/分隔线重做；0.2.7 settings API 向后兼容；0.2.8 旧版 DSH 折叠回退；0.2.9 调色盘配色；**0.3.0 接管官方消息轨 + 外圈 + 0.1.2+ 取数路径修复 + 首次引导 + 设置项重排 + 跳转滚动缓动；0.3.1 「更早历史未加载」提示带 + 一键加载、点击标记落点错位修复；0.3.2 DSH 0.1.7 声明式设置迁移（基于过旧基线，缺 0.2.10~0.3.1 功能）；0.3.3 同一迁移重落在 main 最新内容之上，功能全量回归（volatile 自动成表 + configForms 缝 + 设置卡迁 settings.plugins.tab）**）
 - 分支：PR #10（`feat/rail-mirror-and-dots`）**已并入 main**（merge commit `34bc43c`，0.3.0 发布）；后续维护者改动在其之上（首次引导 / 设置项重排 / 滚动缓动）。`shadow/main` 备用主线已无必要
 
 ---
@@ -47,7 +47,7 @@ dsh-tidychat/
 ```
 
 **相关外部目录（本机）**：
-- 插件注册（link 模式）：`~/.dsh/profiles/web/node_modules/@bananasoldier01/dsh-tidychat` → 软链到上述仓库
+- 插件注册（link 模式）：`~/.dsh/profiles/web/node_modules/@drscrewdriver/dsh-tidychat` → 软链到上述仓库
 - awesome-dsh-plugin 工作克隆：`/Users/wuke/工作文件/DeepSeek_Harness/awesome-dsh-plugin`（fork = BananaSoldier01/awesome-dsh-plugin，上游 remote = awesome-dsh-plugin/awesome-dsh-plugin，投稿分支 add/tidychat 已合并）
 
 ---

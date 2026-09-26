@@ -4,6 +4,20 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [SemVer](https://semver.org/lang/zh-CN/)。
 
+## [0.3.3] — 2026-09-27
+
+0.1.7 线重交付：同一套声明式迁移，**重新落在当前上游 main（0.3.1 全部内容）之上**，修复 0.3.2 丢失的功能；包名 `@drscrewdriver/dsh-tidychat`。
+
+**修复 0.3.2 的缺陷**：0.3.2 的适配基于较早的上游基线（早于 v0.2.10 / v0.3.0 / v0.3.1 合入），导致**缺少「接管官方消息轨」开关**及一系列后续功能。本版把迁移重新套在 main 最新内容上，以下全部回归：
+
+- `hideOfficialNav` 接管官方右缘 TurnNavigator（0.3.2 缺失的核心开关）；
+- `navSide` 左右贴边 / `navStyle` 横线·圆点 / `navRing` 外圈（0.3.2 缺失）；
+- 首次引导（两轨并存选择向导，0.3.2 缺失）；
+- 「更早历史未加载」提示带 + 一键加载、点击标记落点修复（0.3.2 缺失）；
+- 0.3.1 的取数路径修复（事件窗单一事实源——0.3.2 因基线过旧而缺失，旧基线上轨道解析会受同类问题影响）。
+
+声明式设置迁移内容与 0.3.2 相同（Config 15 字段 `.volatile()` 自动成表、客户端 `configForms` 缝、设置卡挂 `settings.plugins.tab`、仅支持 DSH 0.1.7-rc.1+），并已向官方提交 PR（drscrewdriver 侧分支 `feat/settings-registration-0.1.7` → BananaSoldier01/dsh-tidychat#15）。上游包名保持 `@bananasoldier01/dsh-tidychat`；本线（fork 交付线）继续用 `@drscrewdriver` scope。
+
 ## [0.3.2] — 2026-09-26
 
 适配 DSH 0.1.7 的设置面重构：命令式注册退场，改为声明式。

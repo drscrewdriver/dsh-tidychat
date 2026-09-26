@@ -4,4 +4,4 @@
 # dsh.client 声明让浏览器半（exports "./client"，served at /plugins/<id>/client.js）在 Web GUI 加载。
 - insert:
     - id: tidychat
-      name: '@bananasoldier01/dsh-tidychat'
+      name: '@drscrewdriver/dsh-tidychat'

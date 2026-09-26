@@ -55,10 +55,10 @@
 
 ```sh
 # 方式 1（推荐）：npm 包，预构建产物免 allowBuilds 授权
-dsh plugin --profile web add @bananasoldier01/dsh-tidychat
+dsh plugin --profile web add @drscrewdriver/dsh-tidychat
 
 # 方式 2：从 GitHub 安装（推荐钉版本，可复现）
-dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#v0.3.2
+dsh plugin --profile web add git+https://github.com/drscrewdriver/dsh-tidychat.git#v0.3.3
 ```
 
 安装后重启 dsh web + 硬刷新（Cmd+Shift+R）。
@@ -69,10 +69,10 @@ dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat
 
 ```sh
 # 方式 A：npm 方式安装，直接更新
-dsh plugin --profile web update @bananasoldier01/dsh-tidychat
+dsh plugin --profile web update @drscrewdriver/dsh-tidychat
 
 # 方式 B：装的是某个 tag，改钉到新 tag 重新 add
-dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat.git#v0.3.2
+dsh plugin --profile web add git+https://github.com/drscrewdriver/dsh-tidychat.git#v0.3.3
 ```
 
 更新后同样重启 dsh web + 硬刷新。
@@ -91,7 +91,7 @@ dsh plugin --profile web add git+https://github.com/BananaSoldier01/dsh-tidychat
 
 | DSH 版本 | settings 面 | 插件线 |
 | --- | --- | --- |
-| **0.1.7-rc.1+** | **声明式**：Config `.volatile()` 字段由宿主自动渲染成表单，无注册调用 | **✅ v0.3.2+**；插件自带完整设置卡挂在「插件」设置节的 tab |
+| **0.1.7-rc.1+** | **声明式**：Config `.volatile()` 字段由宿主自动渲染成表单，无注册调用 | **✅ v0.3.3+**；插件自带完整设置卡挂在「插件」设置节的 tab |
 | 0.1.2-alpha.2+ ~ 0.1.6 | `installSection`（0.1.7 起移除） | ≤ v0.3.1 |
 | 0.1.0-rc.7 ~ 0.1.2-alpha.1 | `register`（0.1.7 起移除） | ≤ v0.3.1（折叠 / 分隔线 / 自动加载 v0.2.8+ 可用；消息轨 **0.3.0 起可用**，0.2.10 及更早取数路径读错快照，轨道解析出 0 轮、实际从未渲染） |
 
@@ -133,7 +133,7 @@ v0.3.2（DSH 0.1.7+）有两个设置入口，写的是同一份 entry 配置、
 
 ## 🗺️ 路线图
 
-逐版本变更已迁至 [`CHANGELOG.md`](./CHANGELOG.md)。当前 0.3.2，候选方向：
+逐版本变更已迁至 [`CHANGELOG.md`](./CHANGELOG.md)。当前 0.3.3，候选方向：
 
 1. **Turn Index 层**：conversation DOM → Turn Index（id/element/position/summary），由 fold / navigator / autoload 共享，替代每次全量扫描；等真实 500+ 轮数据再定增量方案。
 2. **运行中回合的已完成步骤折叠**（issue #2）：单轮内执行大量动作时实时折叠已完成步骤，需求强度待验证。

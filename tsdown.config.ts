@@ -4,7 +4,7 @@ import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
 const PLUGIN_VERSION = require('./package.json').version
 
-const ID = '@bananasoldier01/dsh-tidychat'
+const ID = '@drscrewdriver/dsh-tidychat'
 // 客户端 bundle 允许 external 的宿主模块（由 loader 的 require 提供）。
 const EXTERNALS = ['react', 'react/jsx-runtime']
 
