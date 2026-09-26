@@ -58,7 +58,7 @@ Prerequisite: DSH (Web) installed, `pnpm` on PATH.
 dsh plugin --profile web add @drscrewdriver/dsh-tidychat
 
 # Option 2: from GitHub (pin a tag for reproducibility)
-dsh plugin --profile web add git+https://github.com/drscrewdriver/dsh-tidychat.git#v0.3.3
+dsh plugin --profile web add git+https://github.com/drscrewdriver/dsh-tidychat.git#v0.3.4
 ```
 
 Restart dsh web + hard refresh (Cmd+Shift+R) after installing.
@@ -72,7 +72,7 @@ The plugin is installed as a profile dependency; updating just re-pulls that dep
 dsh plugin --profile web update @drscrewdriver/dsh-tidychat
 
 # Option B: pinned to a tag — re-add pinned to the new tag
-dsh plugin --profile web add git+https://github.com/drscrewdriver/dsh-tidychat.git#v0.3.3
+dsh plugin --profile web add git+https://github.com/drscrewdriver/dsh-tidychat.git#v0.3.4
 ```
 
 Restart dsh web + hard refresh after updating.
@@ -91,7 +91,7 @@ Restart dsh web + hard refresh after updating.
 
 | DSH version | settings surface | Plugin line |
 | --- | --- | --- |
-| **0.1.7-rc.1+** | **Declarative**: Config `.volatile()` fields are auto-rendered as a form by the host — no registration calls | **✅ v0.3.3+**; the plugin's full settings card lives in its own tab of the "Plugins" settings section |
+| **0.1.7-rc.1+** | **Declarative**: Config `.volatile()` fields are auto-rendered as a form by the host — no registration calls | **✅ v0.3.4+**; the plugin's full settings card lives in its own tab of the "Plugins" settings section |
 | 0.1.2-alpha.2+ ~ 0.1.6 | `installSection` (removed in 0.1.7) | ≤ v0.3.1 |
 | 0.1.0-rc.7 ~ 0.1.2-alpha.1 | `register` (removed in 0.1.7) | ≤ v0.3.1 (fold / divider / auto-load since v0.2.8; rail **since 0.3.0** — on 0.2.10 and earlier the rail read the wrong snapshot, resolved 0 turns and never rendered) |
 
@@ -133,7 +133,7 @@ Pure browser half (`exports "./client"`); the host half only declares the Config
 
 ## 🗺️ Roadmap
 
-Per-version changes live in [`CHANGELOG.md`](./CHANGELOG.md). Currently 0.3.3; candidates:
+Per-version changes live in [`CHANGELOG.md`](./CHANGELOG.md). Currently 0.3.4; candidates:
 
 1. **Turn Index layer**: conversation DOM → Turn Index (id/element/position/summary) shared by fold / navigator / autoload, replacing full rescans; incremental maintenance once real 500+ turn data is available.
 2. **Folding completed in-flight steps** (issue #2): fold completed steps live within a single turn that runs many actions. Demand TBD.
