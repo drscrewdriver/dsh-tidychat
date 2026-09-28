@@ -489,7 +489,7 @@ export function apply(ctx: any): void {
   }
 
   // 设置：tidychat 命名空间，四个开关 + 定位条配色（默认色 auto 尊重主题 + 强调色 auto 跟随主题品牌色）；读不到 settings 服务时全开。
-  const config = { fold: true, divider: true, navigator: false, autoLoad: false, navColor: 'auto', navColorLight: 'l3', navAccent: 'auto', navAccentLight: 'l3' }
+  const config = { fold: true, divider: true, navigator: false, autoLoad: false, navColor: 'auto', navColorLight: 'l3', navAccent: 'auto', navAccentLight: 'l3', navSide: 'left', navStyle: 'bar' }
   let settingsScope: any = null
   const settingsFace = ctx.get('webUiSettings') ?? ctx.get('settingsScope')
   if (settingsFace !== undefined && typeof settingsFace.bind === 'function') {
