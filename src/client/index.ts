@@ -14,6 +14,7 @@
  */
 
 import * as React from 'react'
+import { contrastRatio, hueColor, parseRgba, parseRgb, validColor } from './rail-colors.ts'
 
 // 构建时由 tsdown define 注入插件版本（package.json version）
 declare const __PLUGIN_VERSION__: string
@@ -533,26 +534,7 @@ function injectStyle(css: string): () => void {
 
 const REPORT_TAGS: ReadonlyArray<string> = ['滚动卡顿', '输入卡顿', '界面卡顿', '定位条异常', '自动加载异常', '折叠异常']
 
-// 定位条配色选择项（settings 卡片用）：色系 × 多级明度 正交组合。
-// preview 用于色块预览；明度 l1=浅 / l2=中 / l3=深。
-const NAV_HUE_OPTIONS: ReadonlyArray<{ key: string; label: string; preview: string }> = [
-  { key: 'gray', label: '灰', preview: '#9e9e9e' },
-  { key: 'black', label: '黑', preview: '#111111' },
-  { key: 'white', label: '白', preview: '#f5f5f5' },
-  { key: 'blue', label: '蓝', preview: '#3b82f6' },
-  { key: 'violet', label: '紫', preview: '#8b5cf6' },
-  { key: 'cyan', label: '青', preview: '#06b6d4' },
-  { key: 'green', label: '绿', preview: '#22c55e' },
-  { key: 'orange', label: '橙', preview: '#f97316' },
-  { key: 'red', label: '红', preview: '#ef4444' },
-]
-const NAV_LIGHT_OPTIONS: ReadonlyArray<{ key: string; label: string }> = [
-  { key: 'l1', label: '极浅' },
-  { key: 'l2', label: '浅' },
-  { key: 'l3', label: '中' },
-  { key: 'l4', label: '深' },
-  { key: 'l5', label: '极深' },
-]
+// （定位条配色现走 rail-colors.ts 的调色盘 + 设置卡 colorField 取色器，旧的色系芯片列表已删。）
 const NAV_SIDE_OPTIONS: ReadonlyArray<{ key: string; label: string }> = [
   { key: 'left', label: '左缘' },
   { key: 'right', label: '右缘（镜像）' },
@@ -662,16 +644,6 @@ export function apply(ctx: any): void {
     return (lead !== '' ? lead + ' · ' : '') + body
   }
 
-  const hasTextInStep = (row: Element): boolean => {
-    const think = row.querySelector('[data-variant="think"]')
-    if (think === null) return true
-    let sib: Element | null = think.nextElementSibling
-    while (sib !== null && sib.hasAttribute && sib.hasAttribute('data-tidychat-divider')) {
-      sib = sib.nextElementSibling
-    }
-    return sib !== null
-  }
-
   const applySurgery = (): { inline: number; folded: number; hiddenContext: number } => {
     let inline = 0
     let foldedCount = 0
@@ -738,7 +710,7 @@ export function apply(ctx: any): void {
         return fallbackTurn
       }
       // 判断某行里除了「思考/工具过程」之外是否还有真正的答复正文（文本不在 think / disclosure 内）。
-      const hasAnswerOutsideThink = (row: Element, think: Element): boolean => {
+      const hasAnswerOutsideThink = (row: Element, _think: Element): boolean => {
         const walker = document.createTreeWalker(row, NodeFilter.SHOW_TEXT)
         let node: Node | null
         while ((node = walker.nextNode()) !== null) {
@@ -1232,70 +1204,7 @@ export function apply(ctx: any): void {
     window.open('https://github.com/BananaSoldier01/dsh-tidychat/issues/new?title=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(text), '_blank')
   }
 
-  // ===== 定位条配色：默认色（auto 背景自适应 / 手动色系×明度）+ 强调色（色系×明度）=====
-  // canvas 绘制时从 CSS 变量取值（applyNavColors 统一写入），redraw 不重复计算。
-  // 每个色系 5 档明度 [l1 极浅, l2 浅, l3 中, l4 深, l5 极深]——正交组合即 hue × light 查表。
-  const NAV_HUE_PALETTE: Record<string, [string, string, string, string, string]> = {
-    gray: ['rgba(225,225,225,0.9)', 'rgba(190,190,190,0.78)', 'rgba(128,128,128,0.8)', 'rgba(70,70,70,0.85)', 'rgba(20,20,20,0.92)'],
-    black: ['rgba(90,90,90,0.8)', 'rgba(60,60,60,0.85)', 'rgba(30,30,30,0.9)', 'rgba(12,12,12,0.94)', 'rgba(0,0,0,0.97)'],
-    white: ['rgba(255,255,255,0.95)', 'rgba(250,250,250,0.9)', 'rgba(240,240,240,0.85)', 'rgba(225,225,225,0.8)', 'rgba(205,205,205,0.75)'],
-    blue: ['#93c5fd', '#60a5fa', '#3b82f6', '#2563eb', '#1e40af'],
-    violet: ['#c4b5fd', '#a78bfa', '#8b5cf6', '#7c3aed', '#5b21b6'],
-    cyan: ['#67e8f9', '#22d3ee', '#06b6d4', '#0891b2', '#155e75'],
-    green: ['#86efac', '#4ade80', '#22c55e', '#16a34a', '#166534'],
-    orange: ['#fdba74', '#fb923c', '#f97316', '#ea580c', '#9a3412'],
-    red: ['#fca5a5', '#f87171', '#ef4444', '#dc2626', '#991b1b'],
-  }
-  const NAV_LIGHT_IDX: Record<string, number> = { l1: 0, l2: 1, l3: 2, l4: 3, l5: 4 }
-  const hueColor = (hue: unknown, light: unknown, fallback: string): string => {
-    if (typeof hue === 'string') {
-      const palette = NAV_HUE_PALETTE[hue]
-      if (palette !== undefined) return palette[NAV_LIGHT_IDX[typeof light === 'string' ? light : 'l3'] ?? 2]
-    }
-    return fallback
-  }
-  // 解析颜色，返回 [r, g, b, a]；兼容历史 rgba/rgb 逗号语法、空格 + `/` 语法、#rgb/#rgba/#rrggbb/#rrggbbaa、transparent
-  const parseRgba = (s: string): [number, number, number, number] | null => {
-    const t = (s ?? '').trim().toLowerCase()
-    if (t === '') return null
-    if (t === 'transparent') return [0, 0, 0, 0]
-    const hex = /^#([0-9a-f]{3,8})$/.exec(t)
-    if (hex !== null) {
-      let h = hex[1]
-      if (h.length === 3 || h.length === 4) h = h.split('').map((c) => c + c).join('')
-      if (h.length === 6) h += 'ff'
-      const n = parseInt(h, 16)
-      return [(n >> 24) & 255, (n >> 16) & 255, (n >> 8) & 255, Math.round(((n & 255) / 255) * 1000) / 1000]
-    }
-    const num = (x: string, base: number): number | null => {
-      const v = x.trim()
-      if (v === '') return null
-      const p = v.endsWith('%') ? Number(v.slice(0, -1)) : Number(v)
-      if (Number.isNaN(p)) return null
-      if (base === 255 && v.endsWith('%')) return Math.round((p / 100) * 255)
-      if (base === 1 && v.endsWith('%')) return p / 100
-      return base === 1 ? p : Math.round(p)
-    }
-    const comma = /^rgba?\(\s*([\d.]+%?)\s*,\s*([\d.]+%?)\s*,\s*([\d.]+%?)(?:\s*,\s*([\d.]+%?))?\s*\)$/.exec(t)
-    if (comma !== null) {
-      const r = num(comma[1], 255); const g = num(comma[2], 255); const b = num(comma[3], 255)
-      const a = comma[4] !== undefined ? num(comma[4], 1) : 1
-      if (r === null || g === null || b === null || a === null) return null
-      return [r, g, b, a]
-    }
-    const space = /^rgba?\(\s*([\d.]+%?)\s+([\d.]+%?)\s+([\d.]+%?)(?:\s*\/\s*([\d.]+%?))?\s*\)$/.exec(t)
-    if (space !== null) {
-      const r = num(space[1], 255); const g = num(space[2], 255); const b = num(space[3], 255)
-      const a = space[4] !== undefined ? num(space[4], 1) : 1
-      if (r === null || g === null || b === null || a === null) return null
-      return [r, g, b, a]
-    }
-    return null
-  }
-  const parseRgb = (s: string): [number, number, number] | null => {
-    const a = parseRgba(s)
-    return a === null ? null : [a[0], a[1], a[2]]
-  }
+  // 调色盘 / hue×明度取值 / 颜色解析（parseRgba / parseRgb）已抽到 ./rail-colors.ts（可单元测试）。
   // 向上冒泡找第一个有效非透明背景（alpha=0 跳过）
   const findBackgroundRgb = (): [number, number, number] | null => {
     try {
@@ -1315,28 +1224,6 @@ export function apply(ctx: any): void {
       if (typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches) return true
     } catch { /* 忽略 */ }
     return false
-  }
-  // WCAG 近似相对对比度（指示性元素用 3:1 即可，不必正文级 4.5）
-  const contrastRatio = (a: [number, number, number], b: [number, number, number]): number => {
-    const lum = (c: [number, number, number]): number => {
-      const f = (v: number): number => {
-        const s = v / 255
-        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4)
-      }
-      return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2])
-    }
-    const la = lum(a)
-    const lb = lum(b)
-    const hi = Math.max(la, lb)
-    const lo = Math.min(la, lb)
-    return (hi + 0.05) / (lo + 0.05)
-  }
-  // 自定义色：只接受能被 parseRgba 解析的颜色（#rgb/#rrggbb/#rrggbbaa、rgb()/rgba()），否则回退。
-  const validColor = (raw: unknown, fallback: string): string => {
-    if (typeof raw !== 'string') return fallback
-    const s = raw.trim()
-    if (s === '') return fallback
-    return parseRgba(s) !== null ? s : fallback
   }
   const resolveNavColors = (): { bar: string; hot: string } => {
     const cs = getComputedStyle(document.documentElement)
@@ -1828,7 +1715,7 @@ export function apply(ctx: any): void {
         if (binding === undefined || binding.eventSource === undefined) return
         const face = binding.eventSource
         const pull = () => {
-          let snap: any = null
+          let snap: any
           try { snap = face.getSnapshot() } catch { snap = null }
           setSnapshot(snap)
         }
